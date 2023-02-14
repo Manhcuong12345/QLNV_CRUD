@@ -4,7 +4,8 @@
     ViewData["Title"] = "Account";
 }
 
-
+@if (User.Identity.IsAuthenticated)
+                    {
 <h1>User List</h1>
 
 <hr />
@@ -36,3 +37,4 @@
         }
     </tbody>
 </table>
+}

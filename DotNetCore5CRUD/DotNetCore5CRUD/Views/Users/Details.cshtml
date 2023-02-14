@@ -4,6 +4,8 @@
     ViewData["Title"] = Model.Title;
 }
 
+@if (User.Identity.IsAuthenticated)
+                    {
 <h4>Thông tin chi tiết nhân viên:</h4>
 <div class="row justify-content-between mt-60-px">
     <div class="col-md-5">
@@ -45,3 +47,4 @@
         <p class="text-justify mt-3">@Model.Email</p>*@
     </div>
 </div>
+}
