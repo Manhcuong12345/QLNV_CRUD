@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
 namespace DotNetCore5CRUD.Models
 {
     public class Register
     {
-        
+
         public string Id { get; set; }
 
         [Required]

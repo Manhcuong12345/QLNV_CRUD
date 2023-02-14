@@ -24,7 +24,7 @@ namespace DotNetCore5CRUD.Controllers
         public async Task<IActionResult> Index()
         {
             var users = await _userManager.Users
-                .Select(user => new Register {Email = user.Email ,PhoneNumber = user.PhoneNumber })
+                .Select(user => new Register {Id=user.Id,Email = user.Email ,PhoneNumber = user.PhoneNumber })
                 .ToListAsync();
 
             return View(users);
@@ -32,30 +32,32 @@ namespace DotNetCore5CRUD.Controllers
 
         public IActionResult Update()
         {
-            return View("/Views/Account/AccountForm.cshtml");
+            return View("/Views/Account/Update.cshtml");
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(string Id, string Email, string PhoneNumber)
+        public async Task<IActionResult> Update(string id, string email, string phoneNumber)
         {
-            var user = await _userManager.FindByIdAsync(Id);
+            var user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
-                if (!string.IsNullOrEmpty(Email))
-                    user.Email = Email;
+                if (!string.IsNullOrEmpty(email))
+                    user.Email = email;
                 else
                     ModelState.AddModelError("", "Email cannot be empty");
 
-                if (!string.IsNullOrEmpty(PhoneNumber))
-                    user.PhoneNumber = PhoneNumber;
+                if (!string.IsNullOrEmpty(phoneNumber))
+                    user.PhoneNumber = phoneNumber;
                 else
-                    ModelState.AddModelError("", "Phone cannot be empty");
+                    ModelState.AddModelError("", "Password cannot be empty");
 
-                if (!string.IsNullOrEmpty(Email) && !string.IsNullOrEmpty(PhoneNumber))
+                if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(phoneNumber))
                 {
                     IdentityResult result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded)
                         return RedirectToAction("Index","Account");
+                    else
+                        Errors(result);
                 }
             }
             else
@@ -63,7 +65,29 @@ namespace DotNetCore5CRUD.Controllers
             return View(user);
         }
 
-       
+        private void Errors(IdentityResult result)
+        {
+            foreach (IdentityError error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+        }
+    
+
+
+    [HttpPost]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                IdentityResult result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                    return RedirectToAction("Index");
+            }
+            else
+                ModelState.AddModelError("", "User Not Found");
+            return View("Index", _userManager.Users);
+        }
+
 
     public IActionResult Register()
         {
