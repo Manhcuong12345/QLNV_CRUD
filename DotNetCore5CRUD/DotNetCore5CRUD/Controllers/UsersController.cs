@@ -173,6 +173,8 @@ namespace DotNetCore5CRUD.Controllers
             user.Year = model.Year;
             user.UserName = model.UserName;
             user.Address = model.Address;
+            user.PhoneNumber = model.PhoneNumber;
+            user.Email = model.Email;
 
             _context.SaveChanges();
 
