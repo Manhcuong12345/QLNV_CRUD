@@ -30,66 +30,64 @@ namespace DotNetCore5CRUD.Controllers
             return View(users);
         }
 
-        public IActionResult Update()
+        //public IActionResult Update()
+        //{
+        //    return View("/Views/Account/Update.cshtml");
+        //}
+
+        public async Task<IActionResult> Update(string id)
         {
-            return View("/Views/Account/Update.cshtml");
+            if (id == null)
+                return BadRequest();
+
+            var users = await _userManager.FindByIdAsync(id);
+
+            if (users == null)
+                return NotFound();
+
+            var viewModel = new Register
+            {
+                Id = users.Id,
+                PhoneNumber = users.PhoneNumber,
+                Email = users.Email,
+            };
+
+            return View("Update",viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(string id, string email, string phoneNumber)
+        public async Task<IActionResult> Update(Register model)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user != null)
-            {
-                if (!string.IsNullOrEmpty(email))
-                    user.Email = email;
-                else
-                    ModelState.AddModelError("", "Email cannot be empty");
+            var user = await _userManager.FindByIdAsync(model.Id);
+            if (user == null)
+                return NotFound();
 
-                if (!string.IsNullOrEmpty(phoneNumber))
-                    user.PhoneNumber = phoneNumber;
-                else
-                    ModelState.AddModelError("", "Password cannot be empty");
-
-                if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(phoneNumber))
-                {
-                    IdentityResult result = await _userManager.UpdateAsync(user);
-                    if (result.Succeeded)
-                        return RedirectToAction("Index","Account");
-                    else
-                        Errors(result);
-                }
-            }
-            else
-                ModelState.AddModelError("", "User Not Found");
-            return View(user);
+            user.PhoneNumber = model.PhoneNumber;
+            user.Email = model.Email;
+            await _userManager.UpdateAsync(user);
+          
+            return RedirectToAction("Index","Account");
         }
 
-        private void Errors(IdentityResult result)
-        {
-            foreach (IdentityError error in result.Errors)
-                ModelState.AddModelError("", error.Description);
-        }
-    
 
 
-    [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
-                IdentityResult result = await _userManager.DeleteAsync(user);
+                var result = await _userManager.DeleteAsync(user);
                 if (result.Succeeded)
                     return RedirectToAction("Index");
             }
             else
                 ModelState.AddModelError("", "User Not Found");
-            return View("Index", _userManager.Users);
+            return View("Index","Account");
         }
 
 
-    public IActionResult Register()
+        public IActionResult Register()
         {
             return View();
         }

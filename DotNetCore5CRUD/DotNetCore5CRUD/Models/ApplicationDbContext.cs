@@ -12,5 +12,6 @@ namespace DotNetCore5CRUD.Models
         }
   
         public DbSet<User> User { get; set; }
+        public DbSet<Register> Register { get; set; }
     }
 }
